@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # --------------------
+  # Goアプリケーションサービス
+  # --------------------
+  app:
+    build: . # カレントディレクトリのDockerfileを使用
+    container_name: go_app_container
+    ports:
+      - "${APP_PORT}:${APP_PORT}" # ホスト:コンテナ ポートマッピング (GoアプリがWebサーバを持つ場合)
+    environment:
+      # Goアプリ内で使用するDB接続情報 (重要: ホスト名はサービス名 'db' を使う)
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+    # dbサービスが起動してからappサービスを起動する
+    # 🚨 注意: depends_on はコンテナ起動順序のみ保証し、DBの準備完了までは保証しないため、
+    # main.go のようなリトライ処理が望ましいです。
+    depends_on:
+      - db
+    volumes:
+      - .:/app # ローカルのソースコードをコンテナ内にマウント（開発中に便利）
+    # volumes定義に設定したボリュームをマウント
+    # 外部からの変更が即座に反映されます。
+
+  # --------------------
+  # PostgreSQLデータベースサービス
+  # --------------------
+  db:
+    image: postgres:15-alpine # 軽量なPostgreSQLイメージを使用
+    container_name: postgres_db_container
+    ports:
+      - "${DB_PORT}:${DB_PORT}" # ホスト:コンテナ ポートマッピング（ローカル環境から直接DBに接続する場合）
+    environment:
+      # DBイメージが初期設定に使用する環境変数
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      # データの永続化設定: db_dataという名前付きボリュームにデータを保存
+      - db_data:/var/lib/postgresql/data
+      # 💡 必要に応じて初期化SQLファイルのマウントも可能です
+      # - ./init:/docker-entrypoint-initdb.d/
+
+# 外部ボリュームの定義
+volumes:
+  db_data: # DBデータを永続化するための名前付きボリューム
