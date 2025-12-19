@@ -1,0 +1,12 @@
+version: "2"
+sql:
+  - schema: "../../../docker/postgres/init/create_table.sql"
+    queries: "queries/"
+    engine: "postgresql"
+    gen:
+      go:
+        package: "dbgen"
+        out: "dbgen"
+        # driver を消し、代わりに sql_package を指定します
+        sql_package: "pgx/v5"
+        emit_json_tags: true

@@ -3,38 +3,37 @@ package db
 import (
 	"context"
 	"my-account/internal/domain"
+	"my-account/internal/infrastructure/db/dbgen"
 
 	"github.com/jackc/pgx/v5"
 )
 
-// SaveCategories はカテゴリーを一括登録します
+// SaveCategories (sqlc + pgx/v5 対応)
 func SaveCategories(ctx context.Context, tx pgx.Tx, categories []domain.Category) error {
+	q := dbgen.New(tx) // sql_package: "pgx/v5" により tx が受け入れ可能になります
 	for _, cat := range categories {
-		_, err := tx.Exec(ctx,
-			"INSERT INTO m_categories (category_name) VALUES ($1) ON CONFLICT DO NOTHING",
-			cat.Name) //
-		if err != nil {
+		// CategoryName は varchar(50) への修正を反映させておいてください
+		if err := q.SaveCategory(ctx, cat.Name); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-// FetchAllCategories は全カテゴリーを取得します
+// FetchAllCategories (sqlc + pgx/v5 対応)
 func FetchAllCategories(ctx context.Context, conn *pgx.Conn) ([]domain.Category, error) {
-	rows, err := conn.Query(ctx, "SELECT category_id, category_name FROM m_categories ORDER BY category_id")
+	q := dbgen.New(conn)
+	dbCats, err := q.ListCategories(ctx)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
 
 	var results []domain.Category
-	for rows.Next() {
-		var c domain.Category
-		if err := rows.Scan(&c.ID, &c.Name); err != nil {
-			return nil, err
-		}
-		results = append(results, c)
+	for _, c := range dbCats {
+		results = append(results, domain.Category{
+			ID:   int(c.CategoryID),
+			Name: c.CategoryName,
+		})
 	}
 	return results, nil
 }

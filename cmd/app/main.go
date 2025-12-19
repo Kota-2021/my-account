@@ -41,33 +41,66 @@ func main() {
 	}
 	defer conn.Close(ctx)
 
-	// 1. Excel読込
-	fmt.Println("Excelを読み込み中...")
-	cats, err := excel.LoadCategoriesExcel("categories.xlsx")
+	// --- カテゴリーマスタ (m_categories) の処理 ---
+
+	fmt.Println(">>> カテゴリーマスタの処理を開始")
+	// Excel読込
+	categories, err := excel.LoadCategoriesExcel("categories.xlsx")
 	if err != nil {
-		log.Fatalf("読込エラー: %v", err)
+		log.Printf("カテゴリーExcel読込エラー: %v", err)
+	} else {
+		// トランザクション開始
+		tx, err := conn.Begin(ctx)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer tx.Rollback(ctx)
+
+		// DB保存 (sqlcを利用)
+		if err := db.SaveCategories(ctx, tx, categories); err != nil {
+			log.Fatalf("カテゴリー保存エラー: %v", err)
+		}
+		tx.Commit(ctx)
+		fmt.Println("カテゴリーマスタの更新が完了しました。")
 	}
 
-	// 2. DB書き込み (トランザクション)
-	tx, err := conn.Begin(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer tx.Rollback(ctx)
+	// --- 勘定科目マスタ (m_subjects) の処理 ---
 
-	if err := db.SaveCategories(ctx, tx, cats); err != nil {
-		log.Fatalf("保存エラー: %v", err)
-	}
-	tx.Commit(ctx)
-	fmt.Println("DBへの書き込みが完了しました。")
-
-	// 3. レコードの読みだし確認
-	fmt.Println("\n--- 現在のカテゴリーマスタ ---")
-	savedCats, err := db.FetchAllCategories(ctx, conn)
+	fmt.Println("\n>>> 勘定科目マスタの処理を開始")
+	// Excel読込
+	subjects, err := excel.LoadSubjectsExcel("subjects.xlsx")
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("勘定科目Excel読込エラー: %v", err)
+	} else {
+		tx, err := conn.Begin(ctx)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer tx.Rollback(ctx)
+
+		// DB保存 (sqlcを利用)
+		if err := db.SaveSubjects(ctx, tx, subjects); err != nil {
+			log.Fatalf("勘定科目保存エラー: %v", err)
+		}
+		tx.Commit(ctx)
+		fmt.Println("勘定科目マスタの更新が完了しました。")
 	}
+
+	// --- 登録結果の表示 ---
+
+	fmt.Println("\n--- 登録済みデータの確認 ---")
+
+	// カテゴリー一覧表示
+	savedCats, _ := db.FetchAllCategories(ctx, conn)
+	fmt.Printf("[カテゴリー] %d件登録済み\n", len(savedCats))
 	for _, c := range savedCats {
-		fmt.Printf("[%d] %s\n", c.ID, c.Name)
+		fmt.Printf("  ID:%d - %s\n", c.ID, c.Name)
+	}
+
+	// 勘定科目一覧表示
+	savedSubjects, _ := db.FetchAllSubjects(ctx, conn)
+	fmt.Printf("[勘定科目] %d件登録済み\n", len(savedSubjects))
+	for _, s := range savedSubjects {
+		fmt.Printf("  ID:%d - %s\n", s.Code, s.Name)
 	}
 }
