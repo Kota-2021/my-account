@@ -11,3 +11,9 @@ type Subject struct {
 	Code int    `json:"subject_code"`
 	Name string `json:"subject_name"`
 }
+
+// Book 帳票マスタ (m_books)
+type Book struct {
+	Code int    `json:"book_code"`
+	Name string `json:"book_name"`
+}

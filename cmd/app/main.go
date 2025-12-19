@@ -86,6 +86,28 @@ func main() {
 		fmt.Println("勘定科目マスタの更新が完了しました。")
 	}
 
+	// --- 帳票マスタ (m_books) の処理 ---
+
+	fmt.Println("\n>>> 帳票マスタの処理を開始")
+	// Excel読込
+	books, err := excel.LoadBooksExcel("books.xlsx")
+	if err != nil {
+		log.Printf("帳票マスタExcel読込エラー: %v", err)
+	} else {
+		tx, err := conn.Begin(ctx)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer tx.Rollback(ctx)
+
+		// DB保存 (sqlcを利用)
+		if err := db.SaveBooks(ctx, tx, books); err != nil {
+			log.Fatalf("帳票マスタ保存エラー: %v", err)
+		}
+		tx.Commit(ctx)
+		fmt.Println("帳票マスタの更新が完了しました。")
+	}
+
 	// --- 登録結果の表示 ---
 
 	fmt.Println("\n--- 登録済みデータの確認 ---")
@@ -103,4 +125,13 @@ func main() {
 	for _, s := range savedSubjects {
 		fmt.Printf("  ID:%d - %s\n", s.Code, s.Name)
 	}
+
+	// 帳票マスタ一覧表示
+	savedBooks, _ := db.FetchAllBooks(ctx, conn)
+	fmt.Printf("[帳票マスタ] %d件登録済み\n", len(savedBooks))
+	for _, b := range savedBooks {
+		fmt.Printf("  ID:%d - %s\n", b.Code, b.Name)
+	}
+
+	fmt.Println("✅処理が完了しました。")
 }
