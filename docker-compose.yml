@@ -21,7 +21,7 @@ services:
     volumes:
       # データの永続化設定: db_dataという名前付きボリュームにデータを保存
       - db_data:/var/lib/postgresql/data
-      - ./init:/docker-entrypoint-initdb.d # 追加：./initフォルダ内のSQLを起動時に実行
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d # 追加：./docker/postgres/initフォルダ内のSQLを起動時に実行
 
 # 外部ボリュームの定義
 volumes:

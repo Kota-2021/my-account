@@ -1,6 +1,6 @@
 create table m_categories (
 	category_id SERIAL PRIMARY KEY,
-	category_name varchar(5) NOT NULL
+	category_name varchar(6) NOT NULL
 );
 
 create table m_subjects (
