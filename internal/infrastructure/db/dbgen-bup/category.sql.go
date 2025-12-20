@@ -36,18 +36,12 @@ func (q *Queries) ListCategories(ctx context.Context) ([]MCategory, error) {
 }
 
 const saveCategory = `-- name: SaveCategory :exec
-INSERT INTO m_categories (category_id, category_name)
-VALUES ($1, $2)
-ON CONFLICT (category_id) DO UPDATE 
-SET category_name = EXCLUDED.category_name
+INSERT INTO m_categories (category_name)
+VALUES ($1)
+ON CONFLICT DO NOTHING
 `
 
-type SaveCategoryParams struct {
-	CategoryID   int16  `json:"category_id"`
-	CategoryName string `json:"category_name"`
-}
-
-func (q *Queries) SaveCategory(ctx context.Context, arg SaveCategoryParams) error {
-	_, err := q.db.Exec(ctx, saveCategory, arg.CategoryID, arg.CategoryName)
+func (q *Queries) SaveCategory(ctx context.Context, categoryName string) error {
+	_, err := q.db.Exec(ctx, saveCategory, categoryName)
 	return err
 }

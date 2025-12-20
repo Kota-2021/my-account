@@ -13,7 +13,10 @@ func SaveCategories(ctx context.Context, tx pgx.Tx, categories []domain.Category
 	q := dbgen.New(tx) // sql_package: "pgx/v5" により tx が受け入れ可能になります
 	for _, cat := range categories {
 		// CategoryName は varchar(50) への修正を反映させておいてください
-		if err := q.SaveCategory(ctx, cat.Name); err != nil {
+		if err := q.SaveCategory(ctx, dbgen.SaveCategoryParams{
+			CategoryID:   cat.ID,
+			CategoryName: cat.Name,
+		}); err != nil {
 			return err
 		}
 	}
@@ -31,7 +34,7 @@ func FetchAllCategories(ctx context.Context, conn *pgx.Conn) ([]domain.Category,
 	var results []domain.Category
 	for _, c := range dbCats {
 		results = append(results, domain.Category{
-			ID:   int(c.CategoryID),
+			ID:   int16(c.CategoryID),
 			Name: c.CategoryName,
 		})
 	}

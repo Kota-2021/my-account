@@ -108,6 +108,28 @@ func main() {
 		fmt.Println("帳票マスタの更新が完了しました。")
 	}
 
+	// --- 予算データ (t_buget_financial_data) の処理 ---
+
+	fmt.Println("\n>>> 予算データの処理を開始")
+	// Excel読込
+	bugets, err := excel.LoadBugetsExcel("bugets.xlsx")
+	if err != nil {
+		log.Printf("予算データExcel読込エラー: %v", err)
+	} else {
+		tx, err := conn.Begin(ctx)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer tx.Rollback(ctx)
+
+		// DB保存 (sqlcを利用)
+		if err := db.SaveBugets(ctx, tx, bugets); err != nil {
+			log.Fatalf("予算データ保存エラー: %v", err)
+		}
+		tx.Commit(ctx)
+		fmt.Println("予算データの更新が完了しました。")
+	}
+
 	// --- 登録結果の表示 ---
 
 	fmt.Println("\n--- 登録済みデータの確認 ---")
@@ -131,6 +153,13 @@ func main() {
 	fmt.Printf("[帳票マスタ] %d件登録済み\n", len(savedBooks))
 	for _, b := range savedBooks {
 		fmt.Printf("  ID:%d - %s\n", b.Code, b.Name)
+	}
+
+	// 予算データ一覧表示
+	savedBugets, _ := db.FetchAllBugets(ctx, conn)
+	fmt.Printf("[予算データ] %d件登録済み\n", len(savedBugets))
+	for _, b := range savedBugets {
+		fmt.Printf("  ID:%d - 科目コード:%d - カテゴリーID:%d - 予算:%s - 実績:%s - 差異:%s - 年度:%d\n", b.ID, b.SubjectCode, b.CategoryID, b.Budget, b.Result, b.Difference, b.FiscalYear)
 	}
 
 	fmt.Println("✅処理が完了しました。")

@@ -27,7 +27,7 @@ func LoadSubjectsExcel(filePath string) ([]domain.Subject, error) {
 
 		code, _ := strconv.Atoi(row[0]) // A列: コード
 		subjects = append(subjects, domain.Subject{
-			Code: code,
+			Code: int16(code),
 			Name: row[1], // B列: 科目名
 		})
 	}

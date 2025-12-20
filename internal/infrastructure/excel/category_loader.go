@@ -24,7 +24,7 @@ func LoadCategoriesExcel(filePath string) ([]domain.Category, error) {
 		if i == 0 || len(row) == 0 { // ヘッダーをスキップ
 			continue
 		}
-		categories = append(categories, domain.Category{Name: row[1]})
+		categories = append(categories, domain.Category{ID: int16(i), Name: row[1]})
 	}
 	return categories, nil
 }

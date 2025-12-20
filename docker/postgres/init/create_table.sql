@@ -1,5 +1,5 @@
 create table m_categories (
-	category_id SERIAL PRIMARY KEY,
+	category_id smallint PRIMARY KEY,
 	category_name varchar(6) NOT NULL
 );
 
@@ -13,29 +13,15 @@ create table m_books (
 	book_name varchar(6) NOT NULL
 );
 
-CREATE TABLE m_budgets (
-	budget_id SERIAL PRIMARY KEY,
-	subject_code  smallint NOT NULL,
-	fiscal_year   smallint NOT NULL,
-	budget   numeric(10,2) NOT NULL,
-	category_id   integer,
-
-	CONSTRAINT fk_m_budgets_category
-			FOREIGN KEY (category_id)
-			REFERENCES m_categories(category_id)
-			ON UPDATE CASCADE
-			ON DELETE SET NULL
-);
-
 create table t_cashbook (
 	cashbook_id SERIAL PRIMARY KEY,
 	cashbook_date date NOT NULL,
-	item varchar(20) NOT NULL,
+	item varchar(20),
 	withdrawal decimal NOT NULL,
 	deposit decimal NOT NULL,
 	balance decimal NOT NULL,
-	remarks varchar(20) NOT NULL,
-	book_code smallint,
+	remarks varchar(20),
+	book_code smallint NOT NULL,
 
 	CONSTRAINT fk_t_cashbook_book
 		FOREIGN KEY (book_code)
@@ -49,13 +35,13 @@ create table t_journal (
 	journal_date date NOT NULL,
 	withdrawal decimal NOT NULL,
 	deposit decimal NOT NULL,
-	subject_code smallint,
-	item varchar(20) NOT NULL,
+	subject_code smallint NOT NULL,
+	item varchar(20),
 	customer varchar(20) NOT NULL,
-	evidence varchar(6) NOT NULL,
-	memo varchar(20) NOT NULL,
-	book_code smallint,
-	category_id integer,
+	evidence varchar(6),
+	memo varchar(20),
+	book_code smallint NOT NULL,
+	category_id smallint NOT NULL,
 	fiscal_year smallint NOT NULL,
 
 	CONSTRAINT fk_t_journal_subject
@@ -82,13 +68,13 @@ create table t_receivable (
 	receivable_date date NOT NULL,
 	withdrawal decimal NOT NULL,
 	deposit decimal NOT NULL,
-	subject_code smallint,
-	item varchar(20) NOT NULL,
+	subject_code smallint NOT NULL,
+	item varchar(20),
 	customer varchar(20) NOT NULL,
-	evidence varchar(6) NOT NULL,
-	memo varchar(20) NOT NULL,
-	book_code smallint,
-	category_id integer,
+	evidence varchar(6),
+	memo varchar(20),
+	book_code smallint NOT NULL,
+	category_id smallint NOT NULL,
 	fiscal_year smallint NOT NULL,
 
 	CONSTRAINT fk_t_receivable_subject
@@ -115,13 +101,13 @@ create table t_payable (
 	payable_date date NOT NULL,
 	withdrawal decimal NOT NULL,
 	deposit decimal NOT NULL,
-	subject_code smallint,
-	item varchar(20) NOT NULL,
+	subject_code smallint NOT NULL,
+	item varchar(20),
 	customer varchar(20) NOT NULL,
-	evidence varchar(6) NOT NULL,
-	memo varchar(20) NOT NULL,
-	book_code smallint,
-	category_id integer,
+	evidence varchar(6),
+	memo varchar(20),
+	book_code smallint NOT NULL,
+	category_id smallint NOT NULL,
 	fiscal_year smallint NOT NULL,
 
 	CONSTRAINT fk_t_payable_subject
@@ -143,21 +129,23 @@ create table t_payable (
 		ON DELETE SET NULL
 );
 
-create table t_financial_data (
-	financial_data_id SERIAL PRIMARY KEY,
-	subject_code smallint,
+create table t_buget_financial_data (
+	buget_financial_data_id SERIAL PRIMARY KEY,
+	subject_code smallint NOT NULL,
 	budget decimal NOT NULL,
 	result decimal NOT NULL,
-	category_id integer,
-	fiscal_year smallint NOT NULL,
+	difference decimal NOT NULL,
+	category_id smallint NOT NULL,
+	buget_fiscal_year smallint NOT NULL,
+	UNIQUE (subject_code, buget_fiscal_year),
 
-	CONSTRAINT fk_t_financial_data_subject
+	CONSTRAINT fk_t_buget_financial_data_subject
 		FOREIGN KEY (subject_code)
 		REFERENCES m_subjects(subject_code)
 		ON UPDATE CASCADE
 		ON DELETE SET NULL,
 
-	CONSTRAINT fk_t_financial_data_category
+	CONSTRAINT fk_t_buget_financial_data_category
 		FOREIGN KEY (category_id)
 		REFERENCES m_categories(category_id)
 		ON UPDATE CASCADE

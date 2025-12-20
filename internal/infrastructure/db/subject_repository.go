@@ -34,7 +34,7 @@ func FetchAllSubjects(ctx context.Context, conn *pgx.Conn) ([]domain.Subject, er
 	var results []domain.Subject
 	for _, s := range dbSubjects {
 		results = append(results, domain.Subject{
-			Code: int(s.SubjectCode),
+			Code: int16(s.SubjectCode),
 			Name: s.SubjectName,
 		})
 	}

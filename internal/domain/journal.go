@@ -8,11 +8,11 @@ type Journal struct {
 	Date        string          `json:"journal_date"` // 実際の実装では time.Time
 	Withdrawal  decimal.Decimal `json:"withdrawal"`   // 支払
 	Deposit     decimal.Decimal `json:"deposit"`      // 入金
-	SubjectCode int             `json:"subject_code"`
+	SubjectCode int16           `json:"subject_code"`
 	Item        string          `json:"item"`        // 摘要
 	Customer    string          `json:"customer"`    // 取引先
-	CategoryID  int             `json:"category_id"` // 6つのカテゴリー紐付け
-	FiscalYear  int             `json:"fiscal_year"`
+	CategoryID  int16           `json:"category_id"` // 6つのカテゴリー紐付け
+	FiscalYear  int16           `json:"fiscal_year"`
 }
 
 // Receivable 未収金データ (t_receivable)
@@ -21,11 +21,11 @@ type Receivable struct {
 	Date        string          `json:"journal_date"` // 実際の実装では time.Time
 	Withdrawal  decimal.Decimal `json:"withdrawal"`   // 支払
 	Deposit     decimal.Decimal `json:"deposit"`      // 入金
-	SubjectCode int             `json:"subject_code"`
+	SubjectCode int16           `json:"subject_code"`
 	Item        string          `json:"item"`        // 摘要
 	Customer    string          `json:"customer"`    // 取引先
-	CategoryID  int             `json:"category_id"` // 6つのカテゴリー紐付け
-	FiscalYear  int             `json:"fiscal_year"`
+	CategoryID  int16           `json:"category_id"` // 6つのカテゴリー紐付け
+	FiscalYear  int16           `json:"fiscal_year"`
 }
 
 // Payable 未払金データ (t_payable)
@@ -34,11 +34,11 @@ type Payable struct {
 	Date        string          `json:"journal_date"` // 実際の実装では time.Time
 	Withdrawal  decimal.Decimal `json:"withdrawal"`   // 支払
 	Deposit     decimal.Decimal `json:"deposit"`      // 入金
-	SubjectCode int             `json:"subject_code"`
+	SubjectCode int16           `json:"subject_code"`
 	Item        string          `json:"item"`        // 摘要
 	Customer    string          `json:"customer"`    // 取引先
-	CategoryID  int             `json:"category_id"` // 6つのカテゴリー紐付け
-	FiscalYear  int             `json:"fiscal_year"`
+	CategoryID  int16           `json:"category_id"` // 6つのカテゴリー紐付け
+	FiscalYear  int16           `json:"fiscal_year"`
 }
 
 // Cashbook 出納帳データ (t_cashbook)
@@ -48,5 +48,5 @@ type Cashbook struct {
 	Withdrawal decimal.Decimal `json:"withdrawal"`
 	Deposit    decimal.Decimal `json:"deposit"`
 	Balance    decimal.Decimal `json:"balance"` // 残高（整合性チェックに使用）
-	BookCode   int             `json:"book_code"`
+	BookCode   int16           `json:"book_code"`
 }

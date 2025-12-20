@@ -27,7 +27,7 @@ func LoadBooksExcel(filePath string) ([]domain.Book, error) {
 
 		code, _ := strconv.Atoi(row[0]) // A列: コード
 		books = append(books, domain.Book{
-			Code: code,
+			Code: int16(code),
 			Name: row[1], // B列: 帳票名
 		})
 	}

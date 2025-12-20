@@ -14,7 +14,7 @@ type MBook struct {
 }
 
 type MCategory struct {
-	CategoryID   int16  `json:"category_id"`
+	CategoryID   int32  `json:"category_id"`
 	CategoryName string `json:"category_name"`
 }
 
@@ -25,23 +25,23 @@ type MSubject struct {
 
 type TBugetFinancialDatum struct {
 	BugetFinancialDataID int32          `json:"buget_financial_data_id"`
-	SubjectCode          int16          `json:"subject_code"`
+	SubjectCode          pgtype.Int2    `json:"subject_code"`
 	Budget               pgtype.Numeric `json:"budget"`
 	Result               pgtype.Numeric `json:"result"`
 	Difference           pgtype.Numeric `json:"difference"`
-	CategoryID           int16          `json:"category_id"`
+	CategoryID           pgtype.Int4    `json:"category_id"`
 	BugetFiscalYear      int16          `json:"buget_fiscal_year"`
 }
 
 type TCashbook struct {
 	CashbookID   int32          `json:"cashbook_id"`
 	CashbookDate pgtype.Date    `json:"cashbook_date"`
-	Item         pgtype.Text    `json:"item"`
+	Item         string         `json:"item"`
 	Withdrawal   pgtype.Numeric `json:"withdrawal"`
 	Deposit      pgtype.Numeric `json:"deposit"`
 	Balance      pgtype.Numeric `json:"balance"`
-	Remarks      pgtype.Text    `json:"remarks"`
-	BookCode     int16          `json:"book_code"`
+	Remarks      string         `json:"remarks"`
+	BookCode     pgtype.Int2    `json:"book_code"`
 }
 
 type TJournal struct {
@@ -49,13 +49,13 @@ type TJournal struct {
 	JournalDate pgtype.Date    `json:"journal_date"`
 	Withdrawal  pgtype.Numeric `json:"withdrawal"`
 	Deposit     pgtype.Numeric `json:"deposit"`
-	SubjectCode int16          `json:"subject_code"`
-	Item        pgtype.Text    `json:"item"`
+	SubjectCode pgtype.Int2    `json:"subject_code"`
+	Item        string         `json:"item"`
 	Customer    string         `json:"customer"`
-	Evidence    pgtype.Text    `json:"evidence"`
-	Memo        pgtype.Text    `json:"memo"`
-	BookCode    int16          `json:"book_code"`
-	CategoryID  int16          `json:"category_id"`
+	Evidence    string         `json:"evidence"`
+	Memo        string         `json:"memo"`
+	BookCode    pgtype.Int2    `json:"book_code"`
+	CategoryID  pgtype.Int4    `json:"category_id"`
 	FiscalYear  int16          `json:"fiscal_year"`
 }
 
@@ -64,13 +64,13 @@ type TPayable struct {
 	PayableDate pgtype.Date    `json:"payable_date"`
 	Withdrawal  pgtype.Numeric `json:"withdrawal"`
 	Deposit     pgtype.Numeric `json:"deposit"`
-	SubjectCode int16          `json:"subject_code"`
-	Item        pgtype.Text    `json:"item"`
+	SubjectCode pgtype.Int2    `json:"subject_code"`
+	Item        string         `json:"item"`
 	Customer    string         `json:"customer"`
-	Evidence    pgtype.Text    `json:"evidence"`
-	Memo        pgtype.Text    `json:"memo"`
-	BookCode    int16          `json:"book_code"`
-	CategoryID  int16          `json:"category_id"`
+	Evidence    string         `json:"evidence"`
+	Memo        string         `json:"memo"`
+	BookCode    pgtype.Int2    `json:"book_code"`
+	CategoryID  pgtype.Int4    `json:"category_id"`
 	FiscalYear  int16          `json:"fiscal_year"`
 }
 
@@ -79,12 +79,12 @@ type TReceivable struct {
 	ReceivableDate pgtype.Date    `json:"receivable_date"`
 	Withdrawal     pgtype.Numeric `json:"withdrawal"`
 	Deposit        pgtype.Numeric `json:"deposit"`
-	SubjectCode    int16          `json:"subject_code"`
-	Item           pgtype.Text    `json:"item"`
+	SubjectCode    pgtype.Int2    `json:"subject_code"`
+	Item           string         `json:"item"`
 	Customer       string         `json:"customer"`
-	Evidence       pgtype.Text    `json:"evidence"`
-	Memo           pgtype.Text    `json:"memo"`
-	BookCode       int16          `json:"book_code"`
-	CategoryID     int16          `json:"category_id"`
+	Evidence       string         `json:"evidence"`
+	Memo           string         `json:"memo"`
+	BookCode       pgtype.Int2    `json:"book_code"`
+	CategoryID     pgtype.Int4    `json:"category_id"`
 	FiscalYear     int16          `json:"fiscal_year"`
 }
