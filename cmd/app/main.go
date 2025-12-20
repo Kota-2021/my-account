@@ -41,11 +41,13 @@ func main() {
 	}
 	defer conn.Close(ctx)
 
+	const inputExcelBasePath string = "internal/infrastructure/excel/inputdata/"
+
 	// --- カテゴリーマスタ (m_categories) の処理 ---
 
 	fmt.Println(">>> カテゴリーマスタの処理を開始")
 	// Excel読込
-	categories, err := excel.LoadCategoriesExcel("categories.xlsx")
+	categories, err := excel.LoadCategoriesExcel(inputExcelBasePath + "categories.xlsx")
 	if err != nil {
 		log.Printf("カテゴリーExcel読込エラー: %v", err)
 	} else {
@@ -68,7 +70,7 @@ func main() {
 
 	fmt.Println("\n>>> 勘定科目マスタの処理を開始")
 	// Excel読込
-	subjects, err := excel.LoadSubjectsExcel("subjects.xlsx")
+	subjects, err := excel.LoadSubjectsExcel(inputExcelBasePath + "subjects.xlsx")
 	if err != nil {
 		log.Printf("勘定科目Excel読込エラー: %v", err)
 	} else {
@@ -90,7 +92,7 @@ func main() {
 
 	fmt.Println("\n>>> 帳票マスタの処理を開始")
 	// Excel読込
-	books, err := excel.LoadBooksExcel("books.xlsx")
+	books, err := excel.LoadBooksExcel(inputExcelBasePath + "books.xlsx")
 	if err != nil {
 		log.Printf("帳票マスタExcel読込エラー: %v", err)
 	} else {
@@ -112,7 +114,7 @@ func main() {
 
 	fmt.Println("\n>>> 予算データの処理を開始")
 	// Excel読込
-	bugets, err := excel.LoadBugetsExcel("bugets.xlsx")
+	bugets, err := excel.LoadBugetsExcel(inputExcelBasePath + "bugets.xlsx")
 	if err != nil {
 		log.Printf("予算データExcel読込エラー: %v", err)
 	} else {
