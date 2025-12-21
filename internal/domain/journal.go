@@ -1,6 +1,10 @@
 package domain
 
-import "github.com/shopspring/decimal"
+import (
+	"time"
+
+	"github.com/shopspring/decimal"
+)
 
 // Journal 仕訳帳データ (t_journal)
 type Journal struct {
@@ -44,9 +48,12 @@ type Payable struct {
 // Cashbook 出納帳データ (t_cashbook)
 type Cashbook struct {
 	ID         int             `json:"cashbook_id"`
-	Date       string          `json:"cashbook_date"`
+	Date       time.Time       `json:"cashbook_date"`
+	Item       string          `json:"item"`
 	Withdrawal decimal.Decimal `json:"withdrawal"`
 	Deposit    decimal.Decimal `json:"deposit"`
-	Balance    decimal.Decimal `json:"balance"` // 残高（整合性チェックに使用）
+	Balance    decimal.Decimal `json:"balance"`
+	Remarks    string          `json:"remarks"`
 	BookCode   int16           `json:"book_code"`
+	BookYear   int16           `json:"book_year"`
 }

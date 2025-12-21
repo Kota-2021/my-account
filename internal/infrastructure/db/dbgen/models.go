@@ -42,6 +42,7 @@ type TCashbook struct {
 	Balance      pgtype.Numeric `json:"balance"`
 	Remarks      pgtype.Text    `json:"remarks"`
 	BookCode     int16          `json:"book_code"`
+	BookYear     int16          `json:"book_year"`
 }
 
 type TJournal struct {

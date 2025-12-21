@@ -1,18 +1,22 @@
+-- カテゴリーマスタ
 create table m_categories (
 	category_id smallint PRIMARY KEY,
 	category_name varchar(6) NOT NULL
 );
 
+-- 勘定科目マスタ
 create table m_subjects (
 	subject_code smallint PRIMARY KEY,
 	subject_name varchar(20) NOT NULL
 );
 
+-- 帳票マスタ
 create table m_books (  
 	book_code smallint PRIMARY KEY,
 	book_name varchar(6) NOT NULL
 );
 
+-- 出納帳データ
 create table t_cashbook (
 	cashbook_id SERIAL PRIMARY KEY,
 	cashbook_date date NOT NULL,
@@ -22,6 +26,8 @@ create table t_cashbook (
 	balance decimal NOT NULL,
 	remarks varchar(20),
 	book_code smallint NOT NULL,
+	book_year smallint NOT NULL,
+	UNIQUE (book_code, book_year),
 
 	CONSTRAINT fk_t_cashbook_book
 		FOREIGN KEY (book_code)
@@ -30,6 +36,7 @@ create table t_cashbook (
 		ON DELETE SET NULL
 );
 
+-- 仕訳帳データ
 create table t_journal (
 	journal_id SERIAL PRIMARY KEY,
 	journal_date date NOT NULL,
@@ -63,6 +70,7 @@ create table t_journal (
 		ON DELETE SET NULL
 );
 
+-- 未収金データ
 create table t_receivable (
 	receivable_id SERIAL PRIMARY KEY,
 	receivable_date date NOT NULL,
@@ -96,6 +104,7 @@ create table t_receivable (
 		ON DELETE SET NULL
 );
 
+-- 未払金データ
 create table t_payable (
 	payable_id SERIAL PRIMARY KEY,
 	payable_date date NOT NULL,
@@ -129,6 +138,7 @@ create table t_payable (
 		ON DELETE SET NULL
 );
 
+-- 予算・決算データ
 create table t_buget_financial_data (
 	buget_financial_data_id SERIAL PRIMARY KEY,
 	subject_code smallint NOT NULL,

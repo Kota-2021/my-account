@@ -13,15 +13,18 @@ import (
 )
 
 func main() {
-	ctx := context.Background()
 
+	// 初期設定値
+	const currentYear int16 = 2025
 	currentPath, err := os.Getwd()
 	if err != nil {
 		log.Fatal("Error getting current path")
 	}
-	fmt.Println("current path: ", currentPath)
+	envFilePath := currentPath + "/.env"
+	const inputExcelBasePath string = "internal/infrastructure/excel/inputdata/"
+
 	// .envファイルから環境変数を読み込む
-	err = godotenv.Load(currentPath + "/.env")
+	err = godotenv.Load(envFilePath)
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
@@ -31,17 +34,17 @@ func main() {
 	dbHost := os.Getenv("DB_LOCAL_HOST")
 	dbPort := os.Getenv("DB_PORT")
 	dbTZ := os.Getenv("TZ")
-
 	// DB接続文字列を作成
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?timezone=%s", dbUser, dbPass, dbHost, dbPort, dbName, dbTZ)
 
+	// DB接続情報を取得
+	ctx := context.Background()
+	// DB接続
 	conn, err := pgx.Connect(ctx, connStr)
 	if err != nil {
 		log.Fatalf("接続失敗: %v", err)
 	}
 	defer conn.Close(ctx)
-
-	const inputExcelBasePath string = "internal/infrastructure/excel/inputdata/"
 
 	// --- カテゴリーマスタ (m_categories) の処理 ---
 
@@ -132,6 +135,39 @@ func main() {
 		fmt.Println("予算データの更新が完了しました。")
 	}
 
+	// --- 出納帳データ (t_cashbook) の処理 ---
+
+	// 帳票マスタ一覧を取得する。
+	bookList, _ := db.FetchAllBooks(ctx, conn)
+	fmt.Printf("[帳票マスタ] より %d 件を取得。\n", len(bookList))
+	for _, b := range bookList {
+		fmt.Printf("  ID:%d - %s\n", b.Code, b.Name)
+	}
+
+	fmt.Println("\n>>> 出納帳データの処理を開始")
+	for _, b := range bookList {
+		excelPath := inputExcelBasePath + "cashbook_" + b.Name + ".xlsx"
+		// Excel読込
+		fmt.Printf("  Excelパス: %s\n", excelPath)
+		cashbooks, err := excel.LoadCashbooksExcel(excelPath)
+		if err != nil {
+			log.Printf("出納帳データExcel読込エラー: %v", err)
+		} else {
+			tx, err := conn.Begin(ctx)
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer tx.Rollback(ctx)
+
+			// DB保存 (sqlcを利用)
+			if err := db.SaveCashbooks(ctx, tx, cashbooks, currentYear, b.Code); err != nil {
+				log.Fatalf("出納帳データ保存エラー: %v", err)
+			}
+			tx.Commit(ctx)
+			fmt.Println("出納帳データの更新が完了しました。")
+		}
+	}
+
 	// --- 登録結果の表示 ---
 
 	fmt.Println("\n--- 登録済みデータの確認 ---")
@@ -162,6 +198,13 @@ func main() {
 	fmt.Printf("[予算データ] %d件登録済み\n", len(savedBugets))
 	for _, b := range savedBugets {
 		fmt.Printf("  ID:%d - 科目コード:%d - カテゴリーID:%d - 予算:%s - 実績:%s - 差異:%s - 年度:%d\n", b.ID, b.SubjectCode, b.CategoryID, b.Budget, b.Result, b.Difference, b.FiscalYear)
+	}
+
+	// 出納帳データ一覧表示
+	savedCashbooks, _ := db.FetchAllCashbooks(ctx, conn)
+	fmt.Printf("[出納帳データ] %d件登録済み\n", len(savedCashbooks))
+	for _, c := range savedCashbooks {
+		fmt.Printf("  ID:%d - 日付:%s - 摘要:%s - 支払:%s - 入金:%s - 残高:%s - 備考:%s - 帳票コード:%d - 年度:%d\n", c.ID, c.Date, c.Item, c.Withdrawal, c.Deposit, c.Balance, c.Remarks, c.BookCode, c.BookYear)
 	}
 
 	fmt.Println("✅処理が完了しました。")
