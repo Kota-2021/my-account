@@ -168,6 +168,34 @@ func main() {
 		}
 	}
 
+	// --- 仕訳帳データ (t_journal) の処理 ---
+
+	// 帳票マスタ一覧を取得する。
+
+	fmt.Println("\n>>> 仕訳帳データの処理を開始")
+	for _, b := range bookList {
+		excelPath := inputExcelBasePath + "journal_" + b.Name + ".xlsx"
+		// Excel読込
+		fmt.Printf("  Excelパス: %s\n", excelPath)
+		journals, err := excel.LoadJournalExcel(excelPath)
+		if err != nil {
+			log.Printf("仕訳帳データExcel読込エラー: %v", err)
+		} else {
+			tx, err := conn.Begin(ctx)
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer tx.Rollback(ctx)
+
+			// DB保存 (sqlcを利用)
+			if err := db.SaveJournal(ctx, tx, journals, currentYear, b.Code); err != nil {
+				log.Fatalf("仕訳帳データ保存エラー: %v", err)
+			}
+			tx.Commit(ctx)
+			fmt.Println("仕訳帳データの更新が完了しました。")
+		}
+	}
+
 	// --- 登録結果の表示 ---
 
 	fmt.Println("\n--- 登録済みデータの確認 ---")
@@ -205,6 +233,13 @@ func main() {
 	fmt.Printf("[出納帳データ] %d件登録済み\n", len(savedCashbooks))
 	for _, c := range savedCashbooks {
 		fmt.Printf("  ID:%d - 日付:%s - 摘要:%s - 支払:%s - 入金:%s - 残高:%s - 備考:%s - 帳票コード:%d - 年度:%d\n", c.ID, c.Date, c.Item, c.Withdrawal, c.Deposit, c.Balance, c.Remarks, c.BookCode, c.BookYear)
+	}
+
+	// 仕訳帳データ一覧表示
+	savedJournals, _ := db.FetchAllJournal(ctx, conn)
+	fmt.Printf("[仕訳帳データ] %d件登録済み\n", len(savedJournals))
+	for _, j := range savedJournals {
+		fmt.Printf("  ID:%d - 日付:%s - 摘要:%s - 支払:%s - 入金:%s - 科目コード:%d - 取引先:%s - 証票番号:%s - 備考:%s - 帳票コード:%d - カテゴリーID:%d - 年度:%d\n", j.ID, j.Date, j.Item, j.Withdrawal, j.Deposit, j.SubjectCode, j.Customer, j.Evidence, j.Memo, j.BookCode, j.CategoryID, j.FiscalYear)
 	}
 
 	fmt.Println("✅処理が完了しました。")

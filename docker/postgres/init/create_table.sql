@@ -27,7 +27,6 @@ create table t_cashbook (
 	remarks varchar(20),
 	book_code smallint NOT NULL,
 	book_year smallint NOT NULL,
-	UNIQUE (book_code, book_year),
 
 	CONSTRAINT fk_t_cashbook_book
 		FOREIGN KEY (book_code)
@@ -147,7 +146,7 @@ create table t_buget_financial_data (
 	difference decimal NOT NULL,
 	category_id smallint NOT NULL,
 	buget_fiscal_year smallint NOT NULL,
-	UNIQUE (subject_code, buget_fiscal_year),
+	UNIQUE (subject_code, category_id, buget_fiscal_year),
 
 	CONSTRAINT fk_t_buget_financial_data_subject
 		FOREIGN KEY (subject_code)

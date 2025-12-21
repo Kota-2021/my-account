@@ -1,7 +1,6 @@
 package excel
 
 import (
-	"fmt"
 	"my-account/internal/domain"
 	"strconv"
 	"time"
@@ -23,18 +22,13 @@ func LoadCashbooksExcel(filePath string) ([]domain.Cashbook, error) {
 		return nil, err
 	}
 
-	fmt.Println("len(rows): ", len(rows))
-	fmt.Println("rows[0]: ", rows[0])
-	fmt.Println("rows[0][5]: ", rows[0][5])
-
 	var cashbooks []domain.Cashbook
 	for i, row := range rows {
 		if i == 0 || len(row) < 2 {
 			continue
 		}
 
-		date, _ := time.Parse("2006-01-02", row[0]) // A列: 日付
-		fmt.Println(row[0])
+		date, _ := time.Parse("2006-01-02", row[0])       // A列: 日付
 		item := row[1]                                    // B列: 摘要
 		withdrawal, err := strconv.ParseFloat(row[2], 64) // B列: 支払
 		if err != nil {
@@ -48,7 +42,6 @@ func LoadCashbooksExcel(filePath string) ([]domain.Cashbook, error) {
 		if err != nil {
 			return nil, err
 		}
-		fmt.Println("point1")
 		remarks := ""
 		if len(row) > 5 {
 			remarks = row[5] // E列: 備考

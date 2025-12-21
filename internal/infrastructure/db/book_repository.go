@@ -8,17 +8,6 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-// 参考コード
-// type SaveBookParams struct {
-// 	BookCode int16  `json:"book_code"`
-// 	BookName string `json:"book_name"`
-// }
-
-// func (q *Queries) SaveBook(ctx context.Context, arg SaveBookParams) error {
-// 	_, err := q.db.Exec(ctx, saveBook, arg.BookCode, arg.BookName)
-// 	return err
-// }
-
 // SaveBooks は帳票マスタを一括登録・更新します
 func SaveBooks(ctx context.Context, tx pgx.Tx, books []domain.Book) error {
 	q := dbgen.New(tx)

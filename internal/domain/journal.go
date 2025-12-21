@@ -9,12 +9,15 @@ import (
 // Journal 仕訳帳データ (t_journal)
 type Journal struct {
 	ID          int             `json:"journal_id"`
-	Date        string          `json:"journal_date"` // 実際の実装では time.Time
+	Date        time.Time       `json:"journal_date"` // 実際の実装では time.Time
 	Withdrawal  decimal.Decimal `json:"withdrawal"`   // 支払
 	Deposit     decimal.Decimal `json:"deposit"`      // 入金
 	SubjectCode int16           `json:"subject_code"`
 	Item        string          `json:"item"`        // 摘要
 	Customer    string          `json:"customer"`    // 取引先
+	Evidence    string          `json:"evidence"`    // 証票番号
+	Memo        string          `json:"memo"`        // 摘要
+	BookCode    int16           `json:"book_code"`   // 帳票コード
 	CategoryID  int16           `json:"category_id"` // 6つのカテゴリー紐付け
 	FiscalYear  int16           `json:"fiscal_year"`
 }

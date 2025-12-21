@@ -2,7 +2,7 @@
 INSERT INTO t_buget_financial_data
 (subject_code, budget, result, difference, category_id, buget_fiscal_year)
 VALUES ($1, $2, $3, $4, $5, $6)
-ON CONFLICT (subject_code, buget_fiscal_year) DO UPDATE 
+ON CONFLICT (subject_code, category_id, buget_fiscal_year) DO UPDATE 
 SET subject_code = EXCLUDED.subject_code,
     budget = EXCLUDED.budget,
     result = EXCLUDED.result,
